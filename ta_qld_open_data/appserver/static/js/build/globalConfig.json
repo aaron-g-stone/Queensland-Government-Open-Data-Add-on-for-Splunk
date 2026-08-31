@@ -1,0 +1,575 @@
+{
+    "pages": {
+        "configuration": {
+            "tabs": [
+                {
+                    "name": "proxy",
+                    "title": "Proxy",
+                    "entity": [
+                        {
+                            "type": "checkbox",
+                            "label": "Enable",
+                            "field": "proxy_enabled"
+                        },
+                        {
+                            "type": "singleSelect",
+                            "label": "Proxy Type",
+                            "required": false,
+                            "options": {
+                                "disableSearch": true,
+                                "autoCompleteFields": [
+                                    {
+                                        "value": "http",
+                                        "label": "http"
+                                    },
+                                    {
+                                        "value": "socks4",
+                                        "label": "socks4"
+                                    },
+                                    {
+                                        "value": "socks5",
+                                        "label": "socks5"
+                                    }
+                                ]
+                            },
+                            "defaultValue": "http",
+                            "field": "proxy_type"
+                        },
+                        {
+                            "type": "text",
+                            "label": "Host",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "errorMsg": "Max host length is 4096",
+                                    "minLength": 1,
+                                    "maxLength": 4096
+                                },
+                                {
+                                    "type": "regex",
+                                    "errorMsg": "Proxy Host should not have special characters",
+                                    "pattern": "^[a-zA-Z]\\w*$"
+                                }
+                            ],
+                            "field": "proxy_url",
+                            "required": true
+                        },
+                        {
+                            "type": "text",
+                            "label": "Port",
+                            "validators": [
+                                {
+                                    "type": "number",
+                                    "range": [
+                                        1,
+                                        65535
+                                    ],
+                                    "isInteger": true
+                                }
+                            ],
+                            "field": "proxy_port",
+                            "required": true
+                        },
+                        {
+                            "type": "text",
+                            "label": "Username",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "errorMsg": "Max length of username is 50",
+                                    "minLength": 0,
+                                    "maxLength": 50
+                                }
+                            ],
+                            "field": "proxy_username"
+                        },
+                        {
+                            "type": "text",
+                            "label": "Password",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "errorMsg": "Max length of password is 8192",
+                                    "minLength": 0,
+                                    "maxLength": 8192
+                                }
+                            ],
+                            "encrypted": true,
+                            "field": "proxy_password"
+                        },
+                        {
+                            "type": "checkbox",
+                            "label": "DNS resolution",
+                            "field": "proxy_rdns"
+                        }
+                    ]
+                },
+                {
+                    "name": "logging",
+                    "title": "Logging",
+                    "entity": [
+                        {
+                            "type": "singleSelect",
+                            "label": "Log level",
+                            "options": {
+                                "disableSearch": true,
+                                "autoCompleteFields": [
+                                    {
+                                        "value": "DEBUG",
+                                        "label": "DEBUG"
+                                    },
+                                    {
+                                        "value": "INFO",
+                                        "label": "INFO"
+                                    },
+                                    {
+                                        "value": "WARNING",
+                                        "label": "WARNING"
+                                    },
+                                    {
+                                        "value": "ERROR",
+                                        "label": "ERROR"
+                                    },
+                                    {
+                                        "value": "CRITICAL",
+                                        "label": "CRITICAL"
+                                    }
+                                ]
+                            },
+                            "defaultValue": "INFO",
+                            "field": "loglevel",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "errorMsg": "Log level must be one of: DEBUG, INFO, WARNING, ERROR, CRITICAL",
+                                    "pattern": "^DEBUG|INFO|WARNING|ERROR|CRITICAL$"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "title": "Configuration",
+            "description": "Set up your add-on"
+        },
+        "inputs": {
+            "services": [
+                {
+                    "name": "dataset",
+                    "entity": [
+                        {
+                            "type": "text",
+                            "label": "Name",
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "errorMsg": "Input Name must begin with a letter and consist exclusively of alphanumeric characters and underscores.",
+                                    "pattern": "^[a-zA-Z]\\w*$"
+                                },
+                                {
+                                    "type": "string",
+                                    "errorMsg": "Length of input name should be between 1 and 100",
+                                    "minLength": 1,
+                                    "maxLength": 100
+                                }
+                            ],
+                            "field": "name",
+                            "help": "A unique name for the data input.",
+                            "required": true
+                        },
+                        {
+                            "type": "text",
+                            "field": "interval",
+                            "label": "Interval",
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "errorMsg": "Interval must be either a non-negative number, CRON interval or -1.",
+                                    "pattern": "^((?:-1|\\d+(?:\\.\\d+)?)|(([\\*\\d{1,2}\\,\\-\\/]+\\s){4}[\\*\\d{1,2}\\,\\-\\/]+))$"
+                                },
+                                {
+                                    "type": "number",
+                                    "range": [
+                                        300,
+                                        604800
+                                    ],
+                                    "errorMsg": "Interval must be between 300 and 604800"
+                                }
+                            ],
+                            "help": "Polling interval in seconds. Most open data reference datasets change slowly; daily (86400) is a reasonable default. Very large datasets (e.g. road crash locations, 400k+ rows) may need a longer interval.",
+                            "required": true,
+                            "defaultValue": "86400"
+                        },
+                        {
+                            "type": "singleSelect",
+                            "field": "index",
+                            "label": "Index",
+                            "defaultValue": "default",
+                            "options": {
+                                "endpointUrl": "data/indexes?search=isInternal=0+disabled=0",
+                                "denyList": "^_.*$",
+                                "createSearchChoice": true
+                            },
+                            "validators": [
+                                {
+                                    "type": "index_name"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "singleSelect",
+                            "label": "Popular dataset (optional quick pick)",
+                            "field": "known_dataset",
+                            "defaultValue": "custom",
+                            "help": "Pick a well-known Queensland Government open dataset to auto-fill its Resource ID below, or choose Custom to enter any CKAN DataStore resource_id yourself (from data.qld.gov.au or another CKAN portal).",
+                            "options": {
+                                "disableSearch": false,
+                                "autoCompleteFields": [
+                                    {
+                                        "label": "Custom / other — enter Resource ID manually below",
+                                        "value": "custom"
+                                    },
+                                    {
+                                        "label": "Queensland Public Hospitals",
+                                        "value": "7de61fec-6670-4cad-a163-d955f0102cef"
+                                    },
+                                    {
+                                        "label": "Hospital Performance — Facilities",
+                                        "value": "46bdf22f-498d-4918-8da6-254b04b202c1"
+                                    },
+                                    {
+                                        "label": "Active Mobile Speed Camera Sites",
+                                        "value": "f6b5c37e-de9d-4041-8c18-f4d4b6c593a8"
+                                    },
+                                    {
+                                        "label": "Road Crash Locations (QLD Roads)",
+                                        "value": "e88943c0-5968-4972-a15f-38e120d72ec0"
+                                    },
+                                    {
+                                        "label": "Road Crash Casualties (QLD Roads)",
+                                        "value": "3fc53539-d529-4c1d-85f8-6c92d9e06fc8"
+                                    },
+                                    {
+                                        "label": "State & Non-State School Details",
+                                        "value": "5b39065c-df32-415c-994c-5ff12f8de997"
+                                    },
+                                    {
+                                        "label": "Transport Customer Service Centres",
+                                        "value": "81d78d4f-0cad-4145-9fe6-43526036cabf"
+                                    },
+                                    {
+                                        "label": "Cadastral Key Maps — Queensland",
+                                        "value": "3003e2f6-517c-49e4-88f5-aa3db66f03df"
+                                    }
+                                ]
+                            },
+                            "modifyFieldsOnValue": [
+                                {
+                                    "fieldValue": "7de61fec-6670-4cad-a163-d955f0102cef",
+                                    "fieldsToModify": [
+                                        {
+                                            "fieldId": "resource_id",
+                                            "value": "7de61fec-6670-4cad-a163-d955f0102cef"
+                                        },
+                                        {
+                                            "fieldId": "selected_fields",
+                                            "value": "_id,Hospital and Health Service,Facility Idenitifier,Facility Name,Address,Phone Number,Fax Number"
+                                        },
+                                        {
+                                            "fieldId": "sourcetype",
+                                            "value": "qldgov:opendata:hospitals"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "fieldValue": "46bdf22f-498d-4918-8da6-254b04b202c1",
+                                    "fieldsToModify": [
+                                        {
+                                            "fieldId": "resource_id",
+                                            "value": "46bdf22f-498d-4918-8da6-254b04b202c1"
+                                        },
+                                        {
+                                            "fieldId": "selected_fields",
+                                            "value": "_id,FacilityCode,FacilityName,Address,ContactPhone,FacilityLatitude,FacilityLongitude,FacilityType,NumberOfTreatmentSpaces,OpenHours,OpenDays,FacilityDescription,TreatmentSpacesUpdatedDate,WebUrl,LimitedOpenHours,OpenTime,CloseTime,DataUploadedTimestamp"
+                                        },
+                                        {
+                                            "fieldId": "sourcetype",
+                                            "value": "qldgov:opendata:hospital_performance"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "fieldValue": "f6b5c37e-de9d-4041-8c18-f4d4b6c593a8",
+                                    "fieldsToModify": [
+                                        {
+                                            "fieldId": "resource_id",
+                                            "value": "f6b5c37e-de9d-4041-8c18-f4d4b6c593a8"
+                                        },
+                                        {
+                                            "fieldId": "selected_fields",
+                                            "value": "_id,Site Number,Site Type,Site Status,Primary Descriptor"
+                                        },
+                                        {
+                                            "fieldId": "sourcetype",
+                                            "value": "qldgov:opendata:speed_cameras"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "fieldValue": "e88943c0-5968-4972-a15f-38e120d72ec0",
+                                    "fieldsToModify": [
+                                        {
+                                            "fieldId": "resource_id",
+                                            "value": "e88943c0-5968-4972-a15f-38e120d72ec0"
+                                        },
+                                        {
+                                            "fieldId": "selected_fields",
+                                            "value": "_id,Crash_Ref_Number,Crash_Severity,Crash_Year,Crash_Month,Crash_Day_Of_Week,Crash_Hour,Crash_Nature,Crash_Type,Crash_Longitude,Crash_Latitude,Crash_Street,Crash_Street_Intersecting,State_Road_Name,Loc_Suburb,Loc_Local_Government_Area,Loc_Post_Code,Loc_Police_Division,Loc_Police_District,Loc_Police_Region,Loc_Queensland_Transport_Region,Loc_Main_Roads_Region,Loc_ABS_Statistical_Area_2,Loc_ABS_Statistical_Area_3,Loc_ABS_Statistical_Area_4,Loc_ABS_Remoteness,Loc_State_Electorate,Loc_Federal_Electorate,Crash_Controlling_Authority,Crash_Roadway_Feature,Crash_Traffic_Control,Crash_Speed_Limit,Crash_Road_Surface_Condition,Crash_Atmospheric_Condition,Crash_Lighting_Condition,Crash_Road_Horiz_Align,Crash_Road_Vert_Align,Crash_DCA_Code,Crash_DCA_Description,Crash_DCA_Group_Description,DCA_Key_Approach_Dir,Count_Casualty_Fatality,Count_Casualty_Hospitalised,Count_Casualty_MedicallyTreated,Count_Casualty_MinorInjury,Count_Casualty_Total,Count_Unit_Car,Count_Unit_Motorcycle_Moped,Count_Unit_Truck,Count_Unit_Bus,Count_Unit_Bicycle,Count_Unit_Pedestrian,Count_Unit_Other"
+                                        },
+                                        {
+                                            "fieldId": "sourcetype",
+                                            "value": "qldgov:opendata:road_crash_locations"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "fieldValue": "3fc53539-d529-4c1d-85f8-6c92d9e06fc8",
+                                    "fieldsToModify": [
+                                        {
+                                            "fieldId": "resource_id",
+                                            "value": "3fc53539-d529-4c1d-85f8-6c92d9e06fc8"
+                                        },
+                                        {
+                                            "fieldId": "selected_fields",
+                                            "value": "_id,Crash_Year,Crash_Police_Region,Casualty_Severity,Casualty_AgeGroup,Casualty_Gender,Casualty_RoadUserType,Casualty_Count"
+                                        },
+                                        {
+                                            "fieldId": "sourcetype",
+                                            "value": "qldgov:opendata:road_crash_casualties"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "fieldValue": "5b39065c-df32-415c-994c-5ff12f8de997",
+                                    "fieldsToModify": [
+                                        {
+                                            "fieldId": "resource_id",
+                                            "value": "5b39065c-df32-415c-994c-5ff12f8de997"
+                                        },
+                                        {
+                                            "fieldId": "selected_fields",
+                                            "value": "_id,Centre Code,Centre Name,Centre Type,Centre Status,Host Centre Code,Host Centre Name,Official Low Year Level,Official High Year Level,Officer In Charge Title,School Band,Show Holiday Date,Internet Site,Phone Number,Restrict Contact Outside Teaching Hours,Fax Number,Actual Address Line 1,Actual Address Line 2,Actual Address Line 3,Actual Address Post Code,Postal Address Line 1,Postal Address Line 2,Postal Address Line 3,Postal Address Post Code,Education Geographic Region,Federal Electorate,State Electorate,Local Government Area,Statistical Area Level2,Statistical Area Level2 Code,Remoteness Area,Enrolment Effective Date,All Student Count,Campus All Student Count,ABN,Sector,Non-State Sector,Longitude,Latitude"
+                                        },
+                                        {
+                                            "fieldId": "sourcetype",
+                                            "value": "qldgov:opendata:schools"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "fieldValue": "81d78d4f-0cad-4145-9fe6-43526036cabf",
+                                    "fieldsToModify": [
+                                        {
+                                            "fieldId": "resource_id",
+                                            "value": "81d78d4f-0cad-4145-9fe6-43526036cabf"
+                                        },
+                                        {
+                                            "fieldId": "selected_fields",
+                                            "value": "_id,Title,Description,Keywords,Address 1,Address 2,Suburb,Postcode,Postal address 1,Postal address 2,Postal suburb,Postal postcode,Latitude,Longitude,Phone,Fax,Email,Mon am,Mon pm,Tues am,Tues pm,Wed am,Wed pm,Thurs am,Thurs pm,Fri am,Fri pm,Sat am,Sat pm,Sun am,Sun pm,Closure,Services,servicesnotoffered,ServiceAlert,AddressDetails,MainAlert,TimeAlert,Wheelchair,Type,Last updated,Initial,Holiday,URL,Busy"
+                                        },
+                                        {
+                                            "fieldId": "sourcetype",
+                                            "value": "qldgov:opendata:transport_centres"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "fieldValue": "3003e2f6-517c-49e4-88f5-aa3db66f03df",
+                                    "fieldsToModify": [
+                                        {
+                                            "fieldId": "resource_id",
+                                            "value": "3003e2f6-517c-49e4-88f5-aa3db66f03df"
+                                        },
+                                        {
+                                            "fieldId": "selected_fields",
+                                            "value": "_id,Title,Description,Publication Date,Map Scale,Map preview,Map preview filesize (Megabytes),Download link,Download filesize (Megabytes),Download Format,Additional Information,Copyright status,Map Centre Longitude,Map Centre Latitude,Conditions of Use,Custodian,contributor,ISO topic category,keywords,geographicDescription,boundingBoxEastLongitude,boundingBoxNorthLatitude,boundingBoxSouthLatitude,boundingBoxWestLongitude"
+                                        },
+                                        {
+                                            "fieldId": "sourcetype",
+                                            "value": "qldgov:opendata:cadastral_maps"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "label": "Open Data Portal base URL",
+                            "field": "portal_base_url",
+                            "defaultValue": "https://www.data.qld.gov.au",
+                            "help": "Base URL of the Queensland Government Open Data Portal (fixed; all presets and most public datasets live here).",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "url",
+                                    "errorMsg": "Open Data Portal base URL must be a valid URL."
+                                }
+                            ],
+                            "options": {
+                                "enable": false
+                            }
+                        },
+                        {
+                            "type": "text",
+                            "label": "Resource ID",
+                            "field": "resource_id",
+                            "help": "The dataset's resource_id on the Open Data Portal. Auto-filled if you picked a popular dataset above, or find it yourself on the dataset's page/API info panel (look for resource_id in the URL or the API example snippet).",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "errorMsg": "Resource ID must be a valid UUID.",
+                                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "multipleSelect",
+                            "label": "Fields to ingest",
+                            "field": "selected_fields",
+                            "help": "Choose which fields to ingest. The list refreshes automatically from the Open Data Portal once the base URL and Resource ID are filled in. Leave empty to ingest every field. Labels show the resulting Splunk field name (Splunk naming standard: lowercase, underscores only); values sent to the API are the original source field ids.",
+                            "required": false,
+                            "options": {
+                                "referenceName": "open_data_fields",
+                                "dependencies": [
+                                    "portal_base_url",
+                                    "resource_id"
+                                ],
+                                "labelField": "label",
+                                "valueField": "value",
+                                "delimiter": ","
+                            }
+                        },
+                        {
+                            "type": "text",
+                            "label": "Sourcetype",
+                            "field": "sourcetype",
+                            "defaultValue": "qldgov:opendata:record",
+                            "help": "Sourcetype assigned to ingested events. Auto-filled as qldgov:opendata:<dataset> when you pick a popular dataset above; edit freely for custom resources.",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "errorMsg": "Sourcetype must be lowercase alphanumeric segments separated by colons, e.g. qldgov:opendata:record.",
+                                    "pattern": "^[a-z0-9]+(:[a-z0-9_]+)*$"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "label": "Page size",
+                            "field": "page_size",
+                            "defaultValue": "1000",
+                            "help": "Number of records to request per datastore_search page (advanced; default 1000 works for most datasets).",
+                            "required": false,
+                            "validators": [
+                                {
+                                    "type": "number",
+                                    "errorMsg": "Page size must be a positive integer.",
+                                    "range": [
+                                        1,
+                                        32000
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "inputHelperModule": "qld_open_data_helper",
+                    "title": "Dataset"
+                }
+            ],
+            "title": "Inputs",
+            "description": "Manage your data inputs",
+            "table": {
+                "actions": [
+                    "edit",
+                    "delete",
+                    "clone"
+                ],
+                "header": [
+                    {
+                        "label": "Name",
+                        "field": "name"
+                    },
+                    {
+                        "label": "Interval",
+                        "field": "interval"
+                    },
+                    {
+                        "label": "Index",
+                        "field": "index"
+                    },
+                    {
+                        "label": "Status",
+                        "field": "disabled"
+                    }
+                ],
+                "moreInfo": [
+                    {
+                        "label": "Name",
+                        "field": "name"
+                    },
+                    {
+                        "label": "Interval",
+                        "field": "interval"
+                    },
+                    {
+                        "label": "Index",
+                        "field": "index"
+                    },
+                    {
+                        "label": "Resource ID",
+                        "field": "resource_id"
+                    },
+                    {
+                        "label": "Sourcetype",
+                        "field": "sourcetype"
+                    },
+                    {
+                        "label": "Status",
+                        "field": "disabled",
+                        "mapping": {
+                            "true": "Inactive",
+                            "false": "Active"
+                        }
+                    }
+                ]
+            }
+        },
+        "dashboard": {
+            "panels": [
+                {
+                    "name": "default"
+                }
+            ]
+        }
+    },
+    "meta": {
+        "name": "ta_qld_open_data",
+        "restRoot": "ta_qld_open_data",
+        "version": "0.4.0",
+        "displayName": "Queensland Government Open Data Technical Add-on for Splunk",
+        "schemaVersion": "0.0.10",
+        "supportedThemes": [
+            "light",
+            "dark"
+        ],
+        "supportedPythonVersion": [
+            "3.9",
+            "3.13"
+        ],
+        "defaultView": "inputs",
+        "_uccVersion": "6.6.0"
+    }
+}

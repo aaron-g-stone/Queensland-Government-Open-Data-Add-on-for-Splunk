@@ -1,0 +1,57 @@
+{
+    "dependencies": null,
+    "incompatibleApps": null,
+    "info": {
+        "author": [
+            {
+                "company": null,
+                "email": null,
+                "name": ""
+            }
+        ],
+        "classification": {
+            "categories": [
+                "Utilities"
+            ],
+            "developmentStatus": "Production/Stable",
+            "intendedAudience": "IT Professionals"
+        },
+        "commonInformationModels": null,
+        "description": "Collects datasets from the Queensland Government Open Data Portal (and any other CKAN DataStore-backed portal) and indexes them in Splunk as events.",
+        "id": {
+            "group": null,
+            "name": "ta_qld_open_data",
+            "version": "0.4.0"
+        },
+        "license": {
+            "name": "LICENSE.txt",
+            "text": "./LICENSES/LICENSE.txt",
+            "uri": null
+        },
+        "privacyPolicy": {
+            "name": null,
+            "text": null,
+            "uri": null
+        },
+        "releaseDate": null,
+        "releaseNotes": {
+            "name": "README",
+            "text": "README.txt",
+            "uri": ""
+        },
+        "title": "Queensland Government Open Data Technical Add-on for Splunk"
+    },
+    "inputGroups": null,
+    "platformRequirements": null,
+    "schemaVersion": "2.0.0",
+    "supportedDeployments": [
+        "_standalone",
+        "_distributed",
+        "_search_head_clustering"
+    ],
+    "targetWorkloads": [
+        "_search_heads",
+        "_indexers"
+    ],
+    "tasks": null
+}
